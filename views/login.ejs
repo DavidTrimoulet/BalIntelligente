@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Login</title>     
+    </head>
+
+    <body id="#content">
+        <%- include header.ejs%> 
+        <h1>login</h1>
+        <div>
+            <%=Erreur%>
+        </div>
+        <form action="/checkLogin" method="POST">
+            <label for="user">User : </label>
+            <input type="text" name="user" id="user" />
+            <label for="pass">Pass : </label>
+            <input type="text" name="pass" id="pass" />
+            <input type="submit"/> 
+        </form>
+        <%- include footer.ejs%> 
+    </body>
+</html>

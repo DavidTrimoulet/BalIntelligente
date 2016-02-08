@@ -1,0 +1,9 @@
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script> var socket = io.connect('http://62.210.193.65:8000');
+	socket.on('message', function(message){
+		alert(message);
+		$("#content").load("gotMail.html");
+	});
+</script>
