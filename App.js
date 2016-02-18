@@ -5,6 +5,21 @@ var bodyParser = require('body-parser'); // Charge le middleware de gestion des 
 var myEvents = new EventEmitter();
 
 
+var users = [
+	{
+		type : "user",
+		username : "david",
+		pass : "test"
+	},
+	{
+		type : "postman",
+		username : "postier",
+		pass : "test"
+	}
+];
+
+var messages = [];
+
 function hex_to_ascii(str1)  
  {  
     var hex  = str1.toString();  
@@ -13,11 +28,22 @@ function hex_to_ascii(str1)
         str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));  
     }  
     return str;  
- }  
+ }
+
+ function checkAccount(username, pass){
+ 	for(var i in users){
+ 		console.log(users[i], username, pass);
+ 		if (users[i].username == username && users[i].pass == pass) {
+ 			return users[i];
+ 		};
+ 	}
+ 	console.log("test");
+ 	return null;
+ }
 
 var logged = false;
 var device = "";
-var user = "";
+var user = null;
 var ErreurLogin = "";
 //crée un nouvel événement
 var evenement = new EventEmitter();
@@ -40,9 +66,10 @@ app.use(session({secret: 'test'}))
 })
 
 .post('/checkLogin', function(req, res){
-	if (req.body.user=="test" && req.body.pass=="test"){
+	user = checkAccount(req.body.user, req.body.pass);
+	if (user != null){
 		logged = true;
-		user=req.body.user;
+		console.log(user['type']);
 		res.redirect('/accueil');
 	}
 	else{
@@ -61,12 +88,28 @@ app.use(session({secret: 'test'}))
 	}	
 })
 .post('/update' ,  function(req, res){
-	console.log("Message reçu");
-	evenement.emit('SigMessage', hex_to_ascii(req.body.data));
-	console.log(req.body);
+	//console.log("Message reçu");
+	var dataAscii = hex_to_ascii(req.body.data)
+	res.sendStatus(200)
+	if (dataAscii == 'm') {
+		messages.push({ 'type':'mail', 'time': new Date().toLocaleString() })
+		evenement.emit('SigMessage', 'message');
+	}else{
+		messages.push({ 'type':'pub', 'time': new Date().toLocaleString() })
+	};
 })
-.get('/gotMail', function(req,res){
-	res.render('gotMail.ejs');
+.get('/Mail', function(req,res){
+	console.log(messages);
+	res.render('Mail.ejs', {messages : messages });
+})
+.get('/Delivery', function(req,res){
+	res.render('Delivery.ejs');
+})
+.get('/Option', function(req,res){
+	res.render('Option.ejs');
+})
+.get('/Stat', function(req,res){
+	res.render('Stat.ejs');
 });
 
 io.sockets.on('connection', function(socket){

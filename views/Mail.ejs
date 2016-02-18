@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html>
+    <head>        
+    </head>
+
+    <body>
+        <%- include header.ejs%> 
+        <%- include navBar.ejs%>
+<div class="container" id="content">
+    <div class="mainMenu">
+        <table class="table table-striped table-bordered">
+                <% for(var i=0; i<messages.length; i++) {%>
+                <tr>
+                    <td><%= messages[i].type %></td><td><%= messages[i].time %></td>
+                </tr>
+                <% } %>
+        </table>
+    </div>
+</div>
+        <%- include footer.ejs%> 
+    </body>
+</html>
