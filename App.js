@@ -88,15 +88,13 @@ app.use(session({secret: 'test'}))
 	}	
 })
 .post('/update' ,  function(req, res){
-	//console.log("Message reçu");
-	var dataAscii = hex_to_ascii(req.body.data)
-	res.sendStatus(200)
-	if (dataAscii == 'm') {
-		messages.push({ 'type':'mail', 'time': new Date().toLocaleString() })
+	res.sendStatus(200);
+	var dataAscii = hex_to_ascii(req.body.data);
+	console.log(dataAscii);
+	messages.push({ 'type': dataAscii, 'time': new Date().toLocaleString() })	
+	if (dataAscii == 'mail') {
 		evenement.emit('SigMessage', 'message');
-	}else{
-		messages.push({ 'type':'pub', 'time': new Date().toLocaleString() })
-	};
+	}
 })
 .get('/Mail', function(req,res){
 	console.log(messages);
