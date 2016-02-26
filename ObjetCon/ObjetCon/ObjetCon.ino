@@ -8,14 +8,16 @@ Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 #include <SoftwareSerial.h>
 #define RX_PIN 5
 #define TX_PIN 4
+
 SoftwareSerial sigfox(RX_PIN,TX_PIN);
 
 Servo serrure;
 #define servoPort 9
+#define inter 10
 unsigned long time = 0; 
 
-//0 if closed or 1 if open
-byte doorState = 1;
+//0 if open or 1 if close
+byte doorState = 0;
 
 //Envoie du message Sigfox et lecture du retour.
 void sendMessage(char message[]){
@@ -27,26 +29,30 @@ void sendMessage(char message[]){
 
 void openDoor(){
   //Si la porte est ouverte
-  if(!doorState){
+  digitalWrite(inter,HIGH);
+  if(doorState){
     //Fermeture de la serrure
     serrure.write(90);
     doorState = 1;
     delay(1000);
-    sendMessage("AT$SF=6f 70 65 6e\r");
+    sendMessage("AT$SF=63 6c 6f 73 65\r");
   }else{
     //Ouverture de la serrure
     serrure.write(0);
     doorState = 0;
     delay(1000);
-    sendMessage("AT$SF=63 6c 6f 73 65\r");
+    sendMessage("AT$SF=6f 70 65 6e\r");
   } 
+  digitalWrite(inter,LOW);
 }
 
 void setup() { 
-  //Serial.begin(115200);
+  Serial.begin(115200);
   nfc.begin();
   nfc.SAMConfig();
   pinMode(A0,INPUT);
+  pinMode(inter,INPUT);
+  digitalWrite(inter,LOW);
   serrure.attach(servoPort);
   openDoor();
   sigfox.begin(9600);
@@ -61,15 +67,17 @@ void loop() {
   
   //test si on coupe l'IR et à quelle hauteur
   int distance = analogRead(A0);
-  //Serial.print("distance :"); Serial.println(distance);
+  Serial.print("distance :"); Serial.println(distance);
   //Si on le coupe à hauteur du courrier
-  if(distance > 400 && doorState){
+  if(distance > 350 && doorState){
       //Envoie du message "mail"
+      Serial.println("Mail");
       sendMessage("AT$SF=6d 61 69 6c\r");
   }
   //si on le coupe à hauteur de la Pub
-  else if{distance > 300 && doorState){
+  else if(distance > 250 && doorState){
       //Envoie du message "pub"
+      Serial.println("Pub");
       sendMessage("AT$SF=70 75 62\r");
   }  
   
