@@ -9,10 +9,11 @@
         <%- include navBar.ejs%>
 <div class="container" id="content">
     <div class="mainMenu">
+         <img class="img-responsive" src="img/Ebox.jpg">
         <table class="table table-striped table-bordered">
                 <% for(var i=0; i<messages.length; i++) {%>
                 <tr>
-                    <td><%= messages[i].type %></td><td><%= messages[i].time %></td>
+                    <td><%= messages[i].dataType %></td><td><%= messages[i].time %></td>
                 </tr>
                 <% } %>
         </table>

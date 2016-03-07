@@ -7,18 +7,50 @@ var myEvents = new EventEmitter();
 
 var users = [
 	{
-		type : "user",
+		userType : "user",
 		username : "david",
 		pass : "test"
 	},
 	{
-		type : "postman",
+		userType : "postman",
 		username : "postier",
 		pass : "test"
 	}
 ];
 
 var messages = [];
+var livraisons = [];
+var stat = [];
+
+function makeStat(){
+	var spub = 0;
+	var smail= 0;
+	var sopened= 0;
+	var sclosed= 0;
+	var sunknow= 0;
+	
+	for(i = 0; i < messages.length; i++){
+		if(messages[i].dataType == 'mail'){
+			smail += 1;
+		}else if(messages[i].dataType == 'pub'){
+			spub += 1;
+		}else if(messages[i].dataType == 'open'){
+			sopened += 1;
+		}else if(messages[i].dataType == 'close'){
+			sclosed += 1;
+		}else{
+			sunknow += 1;
+		}
+	}
+	return {
+		mail : smail,
+		pub : spub,
+		opened : sopened,
+		closed : sclosed,
+		delivery : livraisons.length
+	};
+	
+}
 
 function hex_to_ascii(str1)  
  {  
@@ -69,7 +101,6 @@ app.use(session({secret: 'test'}))
 	user = checkAccount(req.body.user, req.body.pass);
 	if (user != null){
 		logged = true;
-		console.log(user['type']);
 		res.redirect('/accueil');
 	}
 	else{
@@ -91,23 +122,31 @@ app.use(session({secret: 'test'}))
 	res.sendStatus(200);
 	var dataAscii = hex_to_ascii(req.body.data);
 	console.log(dataAscii);
-	messages.push({ 'type': dataAscii, 'time': new Date().toLocaleString() })	
+	messages.push({ 'dataType': dataAscii, 'time': new Date().toLocaleString() })	
 	if (dataAscii == 'mail') {
 		evenement.emit('SigMessage', 'message');
 	}
 })
+.post('/delivery' ,  function(req, res){
+	res.sendStatus(200);
+	console.log(req.body.data);
+	livraisons.push({ 'horaire': req.body.data, 'time': new Date().toLocaleString() })
+	horaire = req.body.data;
+	evenement.emit('deliveryMessage', horaire);
+})
 .get('/Mail', function(req,res){
-	console.log(messages);
 	res.render('Mail.ejs', {messages : messages });
 })
 .get('/Delivery', function(req,res){
-	res.render('Delivery.ejs');
+	res.render('Delivery.ejs', {livraisons : livraisons});
 })
 .get('/Option', function(req,res){
 	res.render('Option.ejs');
 })
 .get('/Stat', function(req,res){
-	res.render('Stat.ejs');
+	stat = makeStat();
+	console.log(stat);
+	res.render('Stat.ejs', {stat : stat});
 });
 
 io.sockets.on('connection', function(socket){
@@ -115,9 +154,12 @@ io.sockets.on('connection', function(socket){
 	evenement.on('SigMessage', function(message){
 		socket.emit('message', message);
 	});
+	evenement.on('deliveryMessage', function(horaire){
+		console.log(horaire);
+		socket.emit('delivery', horaire);
+	});
 });
 
 io.on('connection', function(socket){
 	console.log('nouveau client');
 });
-

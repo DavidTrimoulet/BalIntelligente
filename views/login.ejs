@@ -7,19 +7,19 @@
 
     <body>
         <%- include header.ejs%> 
-<div class="container" id="content">
-        <form action="/checkLogin" method="POST" class="form-signin">
-            <h2 class="form-signin-heading">login</h1>
-            <label for="user" >User : </label>
-            <input type="text" class="form-control" name="user" id="user" autofocus />
-            <label for="pass"  >Pass : </label>
-            <input type="text" class="form-control" name="pass" id="pass" />
-            <button class="btn btn-lg btn-primary btn-block" type="submit"/>Sign in</button>
-        </form>
-        <div>
-            <%=Erreur%>
-        </div>
-</div>
+            <div class="container" id="content">
+                    <form action="/checkLogin" method="POST" class="form-signin">
+                        <h2 class="form-signin-heading">login</h1>
+                        <label for="user" >User : </label>
+                        <input type="text" class="form-control" name="user" id="user" autofocus />
+                        <label for="pass"  >Pass : </label>
+                        <input type="text" class="form-control" name="pass" id="pass" />
+                        <button class="btn btn-lg btn-primary btn-block" type="submit"/>Sign in</button>
+                    </form>
+                    <div>
+                        <%=Erreur%>
+                    </div>
+            </div>
         <%- include footer.ejs%> 
     </body>
 </html>
